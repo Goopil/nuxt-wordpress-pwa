@@ -1,17 +1,21 @@
-import request from "axios";
+import request from 'axios'
 
 export default {
-  baseUrl: "https://nuxt.craftedup.com/wp-json/wp/v2/",
+  /**
+   * Base url
+   */
+  baseUrl: 'https://nuxt.craftedup.com/wp-json/wp/v2/',
+
   /**
    * Return a single page
-   * @param  string slug Page slug (e.g. 'sample-page')
+   * @param slug string Page slug (e.g. 'sample-page')
    * @return Promise Filtered response
    */
-  getPage(slug) {
+  getPage (slug) {
     return new Promise((resolve, reject) => {
-      request.defaults.baseURL = this.baseUrl;
+      request.defaults.baseURL = this.baseUrl
       request.get(`pages?slug=${slug}`).then(response => {
-        const data = [...response.data][0];
+        const data = [...response.data][0]
         if (response.status === 200 && response.data.length > 0) {
           const filtered = {
             content: data.content.rendered,
@@ -24,24 +28,25 @@ export default {
             link: data.link,
             slug: data.slug,
             title: data.title.rendered
-          };
-          resolve(filtered);
+          }
+          resolve(filtered)
         } else {
-          reject(response);
+          reject(response)
         }
-      });
-    });
+      })
+    })
   },
+
   /**
    * Return a single post
-   * @param  string slug Post slug (e.g. 'hello-world')
+   * @param slug string Post slug (e.g. 'hello-world')
    * @return Promise Filtered response
    */
-  getPost(slug) {
+  getPost (slug) {
     return new Promise((resolve, reject) => {
-      request.defaults.baseURL = this.baseUrl;
+      request.defaults.baseURL = this.baseUrl
       request.get(`posts?slug=${slug}`).then(response => {
-        const data = [...response.data][0];
+        const data = [...response.data][0]
         if (response.status === 200 && response.data.length > 0) {
           const filtered = {
             content: data.content.rendered,
@@ -54,29 +59,29 @@ export default {
             link: data.link,
             slug: data.slug,
             title: data.title.rendered
-          };
-          resolve(filtered);
+          }
+          resolve(filtered)
         } else {
-          reject(response);
+          reject(response)
         }
-      });
-    });
+      })
+    })
   },
+
   /**
    * Return all posts (paginated)
-   * @param  string slug Post slug (e.g. 'hello-world')
    * @return Promise Filtered response
    */
-  getPosts() {
-    console.log("Request to posts");
+  getPosts () {
+    console.log('Request to posts')
     return new Promise((resolve, reject) => {
-      request.defaults.baseURL = this.baseUrl;
+      request.defaults.baseURL = this.baseUrl
       request.get(`posts`).then(response => {
-        const data = [...response.data];
+        const data = [...response.data]
         if (response.status === 200 && response.data.length > 0) {
           const filtered = {
-            total: response.headers["x-wp-total"],
-            totalPages: response.headers["x-wp-totalpages"],
+            total: response.headers['x-wp-total'],
+            totalPages: response.headers['x-wp-totalpages'],
             data: data.map(item => ({
               id: item.id,
               title: item.title.rendered,
@@ -84,39 +89,40 @@ export default {
               excerpt: item.excerpt.rendered,
               slug: item.slug
             }))
-          };
-          resolve(filtered);
+          }
+          resolve(filtered)
         } else {
-          reject(response);
+          reject(response)
         }
-      });
-    });
+      })
+    })
   },
+
   /**
    * Returns category data and all posts under it (paginated)
-   * @param  string slug Category slug (e.g. 'news')
+   * @param slug string Category slug (e.g. 'news')
    * @return Promise Filtered response
    */
-  getCategory(slug) {
+  getCategory (slug) {
     return new Promise((resolve, reject) => {
-      request.defaults.baseURL = this.baseUrl;
+      request.defaults.baseURL = this.baseUrl
       return request
         .get(`categories?slug=${slug}`)
         .then(response => {
-          const data = [...response.data][0];
+          const data = [...response.data][0]
           if (response.status === 200) {
             return {
               id: data.id,
               name: data.name,
               slug: data.slug
-            };
+            }
           }
         })
         .then(category => {
           return request
             .get(`posts?categories=${category.id}`)
             .then(response => {
-              const data = [...response.data];
+              const data = [...response.data]
               if (response.status === 200) {
                 category.posts = data.map(item => ({
                   id: item.id,
@@ -124,24 +130,30 @@ export default {
                   content: item.content.rendered,
                   excerpt: item.excerpt.rendered,
                   slug: item.slug
-                }));
-                resolve(category);
+                }))
+                resolve(category)
               } else {
-                reject(response);
+                reject(response)
               }
-            });
-        });
-    });
+            })
+        })
+    })
   },
-  getCategories(slug) {
+
+  /**
+   * Returns categories
+   * @returns {Promise}
+   */
+  getCategories () {
     return new Promise((resolve, reject) => {
-      request.defaults.baseURL = this.baseUrl;
+      request.defaults.baseURL = this.baseUrl
       return request.get(`categories`).then(response => {
-        const data = [...response.data];
+        const data = [...response.data]
         if (response.status === 200 && response.data.length > 0) {
-          resolve(data);
+          resolve(data)
         }
-      });
-    });
+      })
+    })
   }
-};
+
+}
